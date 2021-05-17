@@ -1,0 +1,146 @@
+/**
+Write PowerAVLAppTest to read in CSV file and store data items within an AVL Tree
+@author Mahmoodah Jaffer - JFFMAH001
+@since 12 March 2019
+*/
+
+/**
+	PowerAVLAppTest is an app that return the power and voltage of a specified date/time given by user according to the data in the file
+	cleaned_data.csv. If the date/time cannot be found then the app will return "Date/time not found". If no specific date/time is given 
+	then all date/time, power and voltage of all the date/time's will be returned. The data is stored in a AVL Tree.
+*/
+import java.io.*;
+
+
+public class PowerAVLAppTest
+{
+	public static AVLTree powerdata;
+
+	/**
+	The main method takes in the argument which would be the date time and uses the agument to 
+	call either the printAllDateTimes, printDateTime or the readFile function
+	*/
+	public static void main (String [] args) throws IOException
+	{
+
+		if (args.length==0){
+			printAllDateTimes();
+		}
+		else if (args[0].equals("subSet2.txt")){
+			readFile(args[0]);
+		}
+		else{
+			printDateTime(args[0]);
+		}
+
+	}
+
+		/**
+		Method fileData reads in CSV file and stores the voltage, power and voltage data required from CSV file into a
+		BinarySearchTree to store each element
+		@param filename String
+		@return powerdata BinaryTree of type BinarySearchTree
+		@exception FileNotFoundException
+		@exception IOException
+		@see FileNotFoundException
+		@see IOException
+		*/
+		public static AVLTree fileData (String filename) throws FileNotFoundException, IOException
+		{
+
+			AVLTree powerdata = new AVLTree(); //500 element array with PowerStation type to store the reuired data from CSV file
+
+
+			FileReader read = new FileReader(filename); //reads in data from CSV file
+			BufferedReader bread = new BufferedReader(read);// read is wraaped in the BufferedReader
+
+			String firstline = bread.readLine(); //reads first line of text file - nothing will be done with this line because it holds no useful data
+			String line = bread.readLine(); // second line of CSV file is read 
+
+			while (line!=null)
+			{
+				String [] data = line.split(","); //the data from line is split by the commas and is being stored in an array 
+
+				String datetime = data[0]; //sets variable datetime to the first element in data array - Date/Time
+				String power = data[1];//sets variable power to the second element in data array - Global Active Power
+				String voltage = data[3];//sets variable voltage to the fourth element in data array - Voltage
+
+				powerdata.insert(new PowerStation(datetime,power,voltage)); //Powerstation object will store the datetime, power and voltage in element of linepos
+
+				line = bread.readLine(); //reads next line in CSV file
+				
+			}
+			return powerdata;
+
+		
+		}
+
+		/**
+		Method searches for datetime given using the find function in the class BinarySeachTree and return the corresponding voltage and power 
+		@param dateTime String
+		@exception IOException
+		@see IOException
+		*/
+		public static void printDateTime( String dateTime) throws IOException{
+
+			AVLTree avl = fileData("cleaned_data.csv");
+
+			if((avl.find(dateTime))==null){
+				System.out.println("Date/time not found" + "\n" + "Comparison Operations for find method: " + avl.opCounter()+ "\n" + "Comparison Operations for insert method: " + avl.insCounter());
+			}
+			else{
+				avl.opCounter();//reset opCount to zero
+				System.out.println((avl.find(dateTime)) + "\n" + "Comparison Operations for find method: " + avl.opCounter());
+				//avl.insCounter();//reset insCount to zero
+				System.out.println("Comparison Operations for insert method: " + avl.insCounter());
+			}
+
+		}
+
+		/**
+		Method printAllDateTimes dispalys all elements of the BinarySearchTree using the display function in the BinarySearchTree class
+		@exception IOException
+		@see IOException
+		*/
+		public static void printAllDateTimes() throws IOException{
+
+			AVLTree avl = fileData("cleaned_data.csv");
+
+			avl.display();
+			System.out.println(avl.opCounter());
+			System.out.println(avl.insCounter());
+		}
+
+		/**
+		Method readFile reads in specific date times on each line and  return the corresponding information required
+		@param textfile String
+		@exception FileNotFoundException
+		@exception IOException
+		@see FileNotFoundException
+		@see IOException
+		*/
+		public static void readFile(String textfile) throws FileNotFoundException, IOException{
+			
+
+			FileReader fr = new FileReader(textfile); //reads in data from CSV file
+			BufferedReader br = new BufferedReader(fr);// read is wrapped in the BufferedReader
+			String fileline = br.readLine();
+
+			AVLTree avl = fileData("cleaned_data.csv");
+
+			while (fileline!=null){
+				
+				avl.find(fileline);
+				System.out.print(avl.opCounter());
+				System.out.print(",");
+				fileline = br.readLine();
+			}
+			
+
+			
+
+		}
+
+
+
+}
